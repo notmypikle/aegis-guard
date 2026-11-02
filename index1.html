@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aegis Guard — Personal Cyber & Safety Protection</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0b1120;color:#e2e8f0}a{color:#38bdf8}.container{max-width:960px;margin:0 auto;padding:2rem 1rem}.hero{text-align:center;padding:2rem 1rem}.hero h1{font-size:2.2rem;margin-bottom:.5rem}.hero p{color:#94a3b8;font-size:1.1rem}.tiers{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.tier{border:1px solid #1e293b;border-radius:12px;padding:1.5rem;background:#111a2e}.tier.featured{border-color:#38bdf8}.price{font-size:2rem;font-weight:700}.cta{display:inline-block;margin-top:1rem;padding:.6rem 1.2rem;border-radius:8px;background:#38bdf8;color:#0b1120;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-size:1rem}.legal-note{color:#64748b;font-size:.85rem;margin-top:3rem}.auth-form{display:flex;flex-direction:column;gap:.75rem;max-width:320px;margin:1.5rem auto}.auth-form input{padding:.6rem .9rem;border-radius:8px;border:1px solid #1e293b;background:#111a2e;color:#e2e8f0;font-size:1rem}.hidden{display:none}#msg,#msg-login{color:#fbbf24}
+</style>
+</head>
+<body>
+<main class="container">
+<section id="view-landing">
+<div class="hero"><h1>Aegis Guard</h1><p>Personal protection from cyber attacks, online harassment, and stalking — powered by legally licensed public data and expert-guided defense.</p></div>
+<div class="tiers">
+<div class="tier"><h2>Basic</h2><div class="price">$19/mo</div><ul><li>Data-breach monitoring (email & passwords)</li><li>Monthly personal-security report</li><li>Guided account lockdown checklist</li></ul><a class="cta" href="#/signup">Choose Basic</a></div>
+<div class="tier featured"><h2>Family</h2><div class="price">$49/mo</div><ul><li>Everything in Basic, up to 5 people</li><li>Real-time licensed public-safety incident alerts for your area</li><li>Cyberbullying & harassment evidence toolkit</li></ul><a class="cta" href="#/signup">Choose Family</a></div>
+<div class="tier"><h2>Concierge</h2><div class="price">$199/mo</div><ul><li>Everything in Family</li><li>Quarterly 1-on-1 human security review</li><li>Anti-stalking response plan built with you</li><li>Priority support</li></ul><a class="cta" href="#/signup">Choose Concierge</a></div>
+</div>
+<p class="legal-note">Aegis Guard uses only licensed and lawfully published data sources. We do not access private camera networks or re-broadcast scanner audio. Not a law-enforcement service — always call 911 in an emergency.</p>
+<p style="text-align:center"><a href="#/login">Already a member? Log in</a></p>
+</section>
+<section id="view-signup" class="hidden">
+<div class="hero"><h1>Create your account</h1>
+<form class="auth-form" id="form-signup">
+<input type="email" id="su-email" required placeholder="Email">
+<input type="password" id="su-pass" required minlength="8" placeholder="Password (8+ characters)">
+<button class="cta" type="submit">Sign up</button>
+</form><p id="msg"></p><p>Already have an account? <a href="#/login">Log in</a></p></div>
+</section>
+<section id="view-login" class="hidden">
+<div class="hero"><h1>Log in</h1>
+<form class="auth-form" id="form-login">
+<input type="email" id="li-email" required placeholder="Email">
+<input type="password" id="li-pass" required placeholder="Password">
+<button class="cta" type="submit">Log in</button>
+</form><p id="msg-login"></p><p>New here? <a href="#/signup">Create an account</a></p></div>
+</section>
+<section id="view-dashboard" class="hidden">
+<div class="hero"><h1>Your Aegis Guard Dashboard</h1><p id="dash-email"></p></div>
+<div class="tiers">
+<div class="tier"><h2>🛡️ Breach monitoring</h2><p>Coming next — checks if your email appears in data breaches.</p></div>
+<div class="tier"><h2>📍 Local incident alerts</h2><p>Coming next — licensed public-safety alerts for your area.</p></div>
+<div class="tier"><h2>🔒 Lockdown checklist</h2><p>Coming next — guided steps to secure your accounts.</p></div>
+</div>
+<p style="text-align:center"><button class="cta" id="btn-logout">Log out</button></p>
+</section>
+</main>
+<script>
+const sb = window.supabase.createClient("https://mqeuhlbylztywqsmifkg.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xZXVobGJ5bHp0eXdxc21pZmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NTE3ODcsImV4cCI6MjEwOTAyNzc4N30.t4nuXZR0Frq6rc_xERtqyzYjwKeR6eKYHD_7yvdXgYk");
+const views=["landing","signup","login","dashboard"];
+function show(n){views.forEach(v=>document.getElementById("view-"+v).classList.toggle("hidden",v!==n))}
+async function route(){const h=location.hash||"#/";const{data}=await sb.auth.getUser();
+if(data.user){document.getElementById("dash-email").textContent="Signed in as "+data.user.email;show("dashboard");return}
+if(h==="#/signup")show("signup");else if(h==="#/login")show("login");else show("landing")}
+window.addEventListener("hashchange",route);
+document.getElementById("form-signup").addEventListener("submit",async e=>{e.preventDefault();const m=document.getElementById("msg");m.textContent="Creating…";
+const{error}=await sb.auth.signUp({email:document.getElementById("su-email").value,password:document.getElementById("su-pass").value});
+m.textContent=error?"Error: "+error.message:"Account created! Check your email to confirm, then log in.";
+if(!error)setTimeout(()=>location.hash="#/login",2500)});
+document.getElementById("form-login").addEventListener("submit",async e=>{e.preventDefault();const m=document.getElementById("msg-login");m.textContent="Logging in…";
+const{error}=await sb.auth.signInWithPassword({email:document.getElementById("li-email").value,password:document.getElementById("li-pass").value});
+if(error)m.textContent="Error: "+error.message;else{m.textContent="";route()}});
+document.getElementById("btn-logout").addEventListener("click",async()=>{await sb.auth.signOut();location.hash="#/";route()});
+route();
+</script>
+</body>
+</html>
